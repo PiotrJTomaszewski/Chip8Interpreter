@@ -5,6 +5,7 @@
 #include "interpreter.h"
 #include "cpu.h"
 #include "memory.h"
+#include "display.h"
 #include "debug.h"
 
 static inline uint8_t higher_nibble(uint8_t value) { return (value & 0xF0) >> 4; }
@@ -19,7 +20,9 @@ interpreter_t *interpreter_init() {
     interpreter_t *interpreter = malloc(sizeof(interpreter_t));
     interpreter->cpu = cpu_init();
     interpreter->memory = memory_init();
+    display_init(&(interpreter->display));
     memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
+    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/GUESS");
     return interpreter;
 }
 
@@ -33,11 +36,12 @@ void interpreter_run(interpreter_t *interpreter) {
     cpu_t *cpu = interpreter->cpu;
     memory_t *memory = interpreter->memory;
     opcode_t opcode;
-    for (int i=0; i<100; i++) {
+    while (cpu->pc < 0xEA0) {
         debug_info_printf("AD 0x%x", memory->general[cpu->pc]);
         opcode.msb = memory->general[cpu->pc++];
         opcode.lsb = memory->general[cpu->pc++];
         interpreter_exec_op(interpreter, &opcode);
+        display_show(&(interpreter->display));
     }
 }
 
@@ -143,7 +147,16 @@ void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode) {
         cpu->general_reg[x_reg_id] = (rand() % 256) & opcode->lsb;
         break;
     case 0xD: // DRW Vx, Vy, nibble
-        debug_error_print("Opcode 0xDxyn DRW not implemented");
+        {
+            int x_pos = cpu->general_reg[x_reg_id];
+            int y_pos = cpu->general_reg[y_reg_id];
+            int bytes_to_read = lower_nibble(opcode->lsb);
+            int collision = 0;
+            for (int i=0; i<bytes_to_read; ++i) {
+                collision |= display_draw(&(interpreter->display), x_pos, y_pos+i, interpreter->memory->general[cpu->mem_addr_reg + i]);
+            }
+            cpu->general_reg[FLAG_REG_ID] = collision;
+        }
         break;
     case 0xE:
         if (opcode->lsb == 0x9E) { // SKP Vx

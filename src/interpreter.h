@@ -5,10 +5,12 @@
 
 #include "cpu.h"
 #include "memory.h"
+#include "display.h"
 
 typedef struct INTERPRETER {
     cpu_t *cpu;
     memory_t *memory;
+    display_t display;
 } interpreter_t;
 
 interpreter_t *interpreter_init();
