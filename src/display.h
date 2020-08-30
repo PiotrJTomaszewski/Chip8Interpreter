@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#define DISPLAY_COLS 64
 #define DISPLAY_ROWS 32
 
 typedef struct DISPLAY {

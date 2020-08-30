@@ -1,12 +1,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "interpreter.h"
 #include "cpu.h"
 #include "memory.h"
 #include "display.h"
 #include "debug.h"
+
+#define CYCLE_MICRO_SECONDS 5000
 
 static inline uint8_t higher_nibble(uint8_t value) { return (value & 0xF0) >> 4; }
 
@@ -21,8 +24,8 @@ interpreter_t *interpreter_init() {
     interpreter->cpu = cpu_init();
     interpreter->memory = memory_init();
     display_init(&(interpreter->display));
-    memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
-    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/GUESS");
+    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
+    memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/WIPEOFF");
     return interpreter;
 }
 
@@ -36,11 +39,19 @@ void interpreter_run(interpreter_t *interpreter) {
     cpu_t *cpu = interpreter->cpu;
     memory_t *memory = interpreter->memory;
     opcode_t opcode;
+    struct timespec start, end;
+    uint64_t time_delta_us;
     while (cpu->pc < 0xEA0) {
+        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
         debug_info_printf("AD 0x%x", memory->general[cpu->pc]);
         opcode.msb = memory->general[cpu->pc++];
         opcode.lsb = memory->general[cpu->pc++];
         interpreter_exec_op(interpreter, &opcode);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+        time_delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+        if (time_delta_us < CYCLE_MICRO_SECONDS) {
+            usleep(CYCLE_MICRO_SECONDS - time_delta_us);
+        }
         display_show(&(interpreter->display));
     }
 }

@@ -19,4 +19,4 @@ void interpreter_free(interpreter_t *interpreter);
 void interpreter_run(interpreter_t *interpreter);
 void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode);
 
-#endif
+#endif //__INTERPRETER_H__
