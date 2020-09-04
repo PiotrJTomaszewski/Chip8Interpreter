@@ -8,6 +8,7 @@
 #include "memory.h"
 #include "display.h"
 #include "debug.h"
+#include "keyboard.h"
 
 #define CYCLE_MICRO_SECONDS 5000
 
@@ -24,6 +25,7 @@ interpreter_t *interpreter_init() {
     interpreter->cpu = cpu_init();
     interpreter->memory = memory_init();
     display_init(&(interpreter->display));
+    keyboard_init();
     // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
     // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/WIPEOFF");
     memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/INVADERS");
@@ -172,9 +174,13 @@ void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode) {
         break;
     case 0xE:
         if (opcode->lsb == 0x9E) { // SKP Vx
-            debug_error_print("Operation 0xEx9E SKP Vx not implemented");
+            if (keyboard_get_pressed_key() == cpu->general_reg[x_reg_id]) {
+                cpu->pc += 2;
+            }
         } else if (opcode->lsb == 0xA1) {
-            debug_error_print("Operation 0xExA1 SKNP Vx not implemented");
+            if (keyboard_get_pressed_key() != cpu->general_reg[x_reg_id]) {
+                cpu->pc += 2;
+            }
         } else {
             debug_error_printf("Invalid operation 0x%x%x", opcode->msb, opcode->lsb);
         }
