@@ -4,6 +4,7 @@
 #include <ncurses.h>
 
 #define GUI_WINDOWS_NUMBER 5
+#define GUI_MAX_LOGS_NO 18
 
 enum GUI_WINDOW_TYPES {
     GUI_WINDOW_DISPLAY,

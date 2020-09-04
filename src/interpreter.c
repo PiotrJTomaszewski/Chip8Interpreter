@@ -24,9 +24,9 @@ interpreter_t *interpreter_init() {
     interpreter->cpu = cpu_init();
     interpreter->memory = memory_init();
     display_init(&(interpreter->display));
-    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
+    memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
     // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/WIPEOFF");
-    memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/INVADERS");
+    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/INVADERS");
     return interpreter;
 }
 
@@ -58,7 +58,6 @@ void interpreter_run(interpreter_t *interpreter) {
 }
 
 void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode) {
-    debug_info_printf("Executing 0x%x%x", opcode->msb, opcode->lsb);
     cpu_t *cpu = interpreter->cpu;
     int x_reg_id = lower_nibble(opcode->msb);
     int y_reg_id = higher_nibble(opcode->lsb);
