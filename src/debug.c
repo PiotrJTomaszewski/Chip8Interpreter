@@ -66,7 +66,7 @@ void print_registers(cpu_t *cpu) {
 
 void print_memory(memory_t *memory) {
     gui_window_t *window = &gui_windows_global[GUI_WINDOW_MEMORY];
-    const max_width = GUI_MEMORY_WINDOW_WIDTH-1;
+    const int max_width = GUI_MEMORY_WINDOW_WIDTH-1;
     for (int i=0; i<MEMORY_SIZE; ++i) {
         sprintf(buffer, "%02X", memory->general[i]);
         gui_window_print(window, i/max_width, i%max_width, buffer);

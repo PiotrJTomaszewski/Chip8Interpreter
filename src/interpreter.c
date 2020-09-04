@@ -10,8 +10,10 @@
 #include "debug.h"
 #include "keyboard.h"
 
-#define CYCLE_MICRO_SECONDS 1000
-#define TIMER_TICK_MICRO_SECONDS 16666
+// Sources say Chip8 frequency should be about 500Hz
+#define TICK_MICROSECONDS 2000
+#define FRAME_MICROSECONDS 16666
+#define OPERATIONS_PER_FRAME FRAME_MICROSECONDS/TICK_MICROSECONDS
 
 static inline uint8_t higher_nibble(uint8_t value) { return (value & 0xF0) >> 4; }
 
@@ -51,27 +53,25 @@ void interpreter_run(interpreter_t *interpreter) {
     while (cpu->pc < 0xEA0) {
         // TODO: Rework timing
         clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-        opcode.msb = memory->general[cpu->pc++];
-        opcode.lsb = memory->general[cpu->pc++];
-        interpreter_exec_op(interpreter, &opcode);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-        time_delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-        if (time_delta_us < CYCLE_MICRO_SECONDS) {
-            usleep(CYCLE_MICRO_SECONDS - time_delta_us);
+        for (int cycles=0; cycles<OPERATIONS_PER_FRAME; ++cycles) {
+            opcode.msb = memory->general[cpu->pc++];
+            opcode.lsb = memory->general[cpu->pc++];
+            interpreter_exec_op(interpreter, &opcode);
         }
-        timer_elapsed += CYCLE_MICRO_SECONDS;
-        if (timer_elapsed > TIMER_TICK_MICRO_SECONDS) {
-            timer_elapsed = 0;
-            cpu_t *cpu = interpreter->cpu;
-            if (cpu->delay_timer_reg > 0) {
-                --(cpu->delay_timer_reg);
-            }
-            if (cpu->sound_timer_reg > 0) {
-                --(cpu->delay_timer_reg);
-            }
+        cpu_t *cpu = interpreter->cpu;
+        if (cpu->delay_timer_reg > 0) {
+            --(cpu->delay_timer_reg);
+        }
+        if (cpu->sound_timer_reg > 0) {
+            --(cpu->sound_timer_reg);
         }
         print_registers(interpreter->cpu);
         display_show(&(interpreter->display));
+        clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+        time_delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+        if (time_delta_us < FRAME_MICROSECONDS) {
+            usleep(FRAME_MICROSECONDS - time_delta_us);
+        }
     }
 }
 

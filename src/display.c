@@ -41,5 +41,4 @@ void display_clear(display_t *display) {
             display->buffer[i][j] = 0;
         }
     }
-    display_show(display);
 }
