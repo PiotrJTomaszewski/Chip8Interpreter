@@ -10,7 +10,7 @@
 #include "debug.h"
 #include "keyboard.h"
 
-#define CYCLE_MICRO_SECONDS 5000
+#define CYCLE_MICRO_SECONDS 1000
 #define TIMER_TICK_MICRO_SECONDS 16666
 
 static inline uint8_t higher_nibble(uint8_t value) { return (value & 0xF0) >> 4; }
@@ -142,7 +142,7 @@ void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode) {
     switch (higher_nibble(opcode->msb)) {
     case 0x0:
         if (opcode->lsb == 0xE0) { // CLS
-            debug_error_print("Operation 0x00E0 CLS not implemented");
+            display_clear(&(interpreter->display));
         } else if (opcode->lsb == 0xEE) { // RET
             cpu->pc = interpreter->memory->stack[cpu->sp--];
         } else {

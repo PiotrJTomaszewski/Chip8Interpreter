@@ -19,4 +19,6 @@ int display_draw(display_t *display, int x, int y, uint8_t byte);
 
 void display_show(display_t *display);
 
+void display_clear(display_t *display);
+
 #endif //__DISPLAY_H__

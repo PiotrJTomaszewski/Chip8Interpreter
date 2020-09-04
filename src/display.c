@@ -34,3 +34,12 @@ void display_show(display_t *display) {
     }
     gui_window_refresh(&gui_windows_global[GUI_WINDOW_DISPLAY]);
 }
+
+void display_clear(display_t *display) {
+    for (int i=0; i<DISPLAY_ROWS; i++) {
+        for (int j=0; j<64; j++) {
+            display->buffer[i][j] = 0;
+        }
+    }
+    display_show(display);
+}
