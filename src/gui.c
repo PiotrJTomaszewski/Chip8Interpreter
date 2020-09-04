@@ -8,9 +8,9 @@ gui_window_t gui_windows_global[] = {
     // GUI_WINDOW_REGISTERS
     {.width=32, .height=18, .start_x=0, .start_y=32+2, .title="Registers"},
     // GUI_WINDOW_LOGS
-    {.width=64, .height=GUI_MAX_LOGS_NO, .start_x=32+2, .start_y=32+2, .title="Logs"},
+    {.width=GUI_LOGS_WINDOW_WIDTH, .height=GUI_LOGS_WINDOW_HEIGHT, .start_x=32+2, .start_y=32+2, .title="Logs"},
     // GUI_WINDOW_MEMORY
-    {.width=90, .height=52, .start_x=64+2+32+2, .start_y=0, .title="Memory"},
+    {.width=GUI_MEMORY_WINDOW_WIDTH, .height=GUI_MEMORY_WINDOW_HEIGHT, .start_x=64+2+32+2, .start_y=0, .title="Memory"},
 };
 
 void gui_window_print(gui_window_t *gui_window, int y, int x, const char *text) {
