@@ -60,6 +60,66 @@ void interpreter_run(interpreter_t *interpreter) {
     }
 }
 
+static inline uint16_t add_16bit(uint16_t a, uint16_t b) {
+    return (a + b) % (1 << 16);
+}
+
+// Multiple opcodes start with 0xF so handle them in a separate function
+static inline void interpeter_exec_op0xF(interpreter_t *interpreter, opcode_t *opcode) {
+    int x_reg_id = lower_nibble(opcode->msb);
+    cpu_t *cpu = interpreter->cpu;
+    switch(opcode->lsb) {
+        case 0x07: // LD Vx, DelayTimer
+            cpu->general_reg[x_reg_id] =  cpu->delay_timer_reg;
+            break;
+        case 0x0A: // LD Vx, KEY (wait for key press)
+            {
+                uint8_t pressed_key;
+                do {
+                    pressed_key = keyboard_get_pressed_key(TRUE);
+                } while (pressed_key == KEYBOARD_NO_KEY_PRESSED);
+                cpu->general_reg[x_reg_id] = pressed_key;
+            }
+            break;
+        case 0x15: // LD DelayTimer, Vx
+            cpu->delay_timer_reg = cpu->general_reg[x_reg_id];
+            break;
+        case 0x18: // LD SoundTimer, Vx
+            cpu->sound_timer_reg = cpu->general_reg[x_reg_id];
+            break;
+        case 0x1E: // ADD I, Vx
+            cpu->mem_addr_reg = add_16bit(cpu->mem_addr_reg, (uint16_t)cpu->general_reg[x_reg_id]);
+            break;
+        case 0x29: // LD F, Vx
+            debug_error_printf("Operation 0x%x%x not implemented", opcode->msb, opcode->lsb);
+            break;
+        case 0x33: // LD BCD, Vx (Store BCD representation at I, I+1, I+2)
+            {
+                uint8_t *memory = interpreter->memory->general;
+                uint8_t value_to_store = cpu->general_reg[x_reg_id];
+                memory[cpu->mem_addr_reg] = value_to_store / 100;
+                memory[add_16bit(cpu->mem_addr_reg, 1)] = (value_to_store % 100) / 10;
+                memory[add_16bit(cpu->mem_addr_reg, 2)] = value_to_store % 10;
+            }
+            break;
+        case 0x55: // LD [I], Vx (Store V0 to Vx in memory)
+            for (int i=0; i<=x_reg_id; ++i) {
+                interpreter->memory->general[cpu->mem_addr_reg+i] = cpu->general_reg[i];
+            }
+            cpu->mem_addr_reg = add_16bit(cpu->mem_addr_reg, (uint16_t)x_reg_id+1);
+            break;
+        case 0x65: // LD Vx, [I] (Read registers V0 to Vx from memory)
+            for (int i=0; i<=x_reg_id; ++i) {
+                cpu->general_reg[i] = interpreter->memory->general[cpu->mem_addr_reg+i];
+            }
+            cpu->mem_addr_reg = add_16bit(cpu->mem_addr_reg, (uint16_t)x_reg_id+1);
+            break;
+        default: 
+            debug_error_printf("Invalid operation 0x%x%x", opcode->msb, opcode->lsb);
+            break;
+    }
+}
+
 void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode) {
     cpu_t *cpu = interpreter->cpu;
     int x_reg_id = lower_nibble(opcode->msb);
@@ -174,11 +234,11 @@ void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode) {
         break;
     case 0xE:
         if (opcode->lsb == 0x9E) { // SKP Vx
-            if (keyboard_get_pressed_key() == cpu->general_reg[x_reg_id]) {
+            if (keyboard_get_pressed_key(FALSE) == cpu->general_reg[x_reg_id]) {
                 cpu->pc += 2;
             }
-        } else if (opcode->lsb == 0xA1) {
-            if (keyboard_get_pressed_key() != cpu->general_reg[x_reg_id]) {
+        } else if (opcode->lsb == 0xA1) { // SKNP Vx
+            if (keyboard_get_pressed_key(FALSE) != cpu->general_reg[x_reg_id]) {
                 cpu->pc += 2;
             }
         } else {
@@ -186,7 +246,8 @@ void interpreter_exec_op(interpreter_t *interpreter, opcode_t *opcode) {
         }
         break;
     case 0xF:
-        debug_error_print("Operation 0xFxxx not implemented");
+        // Multiple opcodes start with 0xF so handle them in a separate function
+        interpeter_exec_op0xF(interpreter, opcode);
         break;
     default:
         debug_error_printf("Invalid operation 0x%x%x", opcode->msb, opcode->lsb);

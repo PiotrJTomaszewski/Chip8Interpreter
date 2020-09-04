@@ -25,11 +25,16 @@
 
 void keyboard_init() {
     WINDOW *window = gui_windows_global[GUI_WINDOW_DISPLAY].window;
-    wtimeout(window, 0);
+    // wtimeout(window, 0);
     keypad(window, TRUE);
 }
 
-uint8_t keyboard_get_pressed_key() {
+uint8_t keyboard_get_pressed_key(int blocking) {
+    if (blocking) {
+        wtimeout(gui_windows_global[GUI_WINDOW_DISPLAY].window, -1);
+    } else {
+        wtimeout(gui_windows_global[GUI_WINDOW_DISPLAY].window, 0);
+    }
     char c = wgetch(gui_windows_global[GUI_WINDOW_DISPLAY].window);
     int pressed_key;
     switch(c) {
