@@ -11,6 +11,7 @@
 #include "keyboard.h"
 
 #define CYCLE_MICRO_SECONDS 5000
+#define TIMER_TICK_MICRO_SECONDS 16666
 
 static inline uint8_t higher_nibble(uint8_t value) { return (value & 0xF0) >> 4; }
 
@@ -45,7 +46,10 @@ void interpreter_run(interpreter_t *interpreter) {
     opcode_t opcode;
     struct timespec start, end;
     uint64_t time_delta_us;
+    // Time elapsed from the last timer tick
+    uint64_t timer_elapsed = 0;
     while (cpu->pc < 0xEA0) {
+        // TODO: Rework timing
         clock_gettime(CLOCK_MONOTONIC_RAW, &start);
         opcode.msb = memory->general[cpu->pc++];
         opcode.lsb = memory->general[cpu->pc++];
@@ -54,6 +58,17 @@ void interpreter_run(interpreter_t *interpreter) {
         time_delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
         if (time_delta_us < CYCLE_MICRO_SECONDS) {
             usleep(CYCLE_MICRO_SECONDS - time_delta_us);
+        }
+        timer_elapsed += CYCLE_MICRO_SECONDS;
+        if (timer_elapsed > TIMER_TICK_MICRO_SECONDS) {
+            timer_elapsed = 0;
+            cpu_t *cpu = interpreter->cpu;
+            if (cpu->delay_timer_reg > 0) {
+                --(cpu->delay_timer_reg);
+            }
+            if (cpu->sound_timer_reg > 0) {
+                --(cpu->delay_timer_reg);
+            }
         }
         print_registers(interpreter->cpu);
         display_show(&(interpreter->display));
