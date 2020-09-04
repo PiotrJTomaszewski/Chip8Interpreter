@@ -4,9 +4,10 @@
 #include <stdint.h>
 
 #define FLAG_REG_ID 0x0F
+#define GENERAL_REGISTERS_NO 16
 
 typedef struct CPU {
-    uint8_t general_reg[16];
+    uint8_t general_reg[GENERAL_REGISTERS_NO];
     uint16_t mem_addr_reg; // Register I
     uint8_t delay_timer_reg;
     uint8_t sound_timer_reg;

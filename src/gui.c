@@ -6,7 +6,9 @@ gui_window_t gui_windows_global[] = {
     // GUI_WINDOW_INSTRUCTIONS
     {.width=32, .height=32, .start_x=0, .start_y=0, .title="Instructions"},
     // GUI_WINDOW_REGISTERS
-    {.width=64+32+2, .height=18, .start_x=0, .start_y=32+2, .title="Registers"},
+    {.width=32+2, .height=18, .start_x=0, .start_y=32+2, .title="Registers"},
+    // GUI_WINDOW_LOGS
+    {.width=64, .height=18, .start_x=32+2, .start_y=32+2, .title="Logs"},
     // GUI_WINDOW_MEMORY
     {.width=90, .height=52, .start_x=64+2+32+2, .start_y=0, .title="Memory"},
 };

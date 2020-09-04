@@ -19,13 +19,14 @@ static inline uint8_t lower_nibble(uint8_t value) { return value & 0x0F; }
 static inline uint16_t address_from_opcode(opcode_t *opcode) { return ((opcode->msb & 0x0F) << 8) + opcode->lsb; }
 
 interpreter_t *interpreter_init() {
-    srand(time(NULL));
+    srand(time(0));
     interpreter_t *interpreter = malloc(sizeof(interpreter_t));
     interpreter->cpu = cpu_init();
     interpreter->memory = memory_init();
     display_init(&(interpreter->display));
     // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
-    memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/WIPEOFF");
+    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/WIPEOFF");
+    memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/INVADERS");
     return interpreter;
 }
 
@@ -43,7 +44,6 @@ void interpreter_run(interpreter_t *interpreter) {
     uint64_t time_delta_us;
     while (cpu->pc < 0xEA0) {
         clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-        debug_info_printf("AD 0x%x", memory->general[cpu->pc]);
         opcode.msb = memory->general[cpu->pc++];
         opcode.lsb = memory->general[cpu->pc++];
         interpreter_exec_op(interpreter, &opcode);
@@ -52,6 +52,7 @@ void interpreter_run(interpreter_t *interpreter) {
         if (time_delta_us < CYCLE_MICRO_SECONDS) {
             usleep(CYCLE_MICRO_SECONDS - time_delta_us);
         }
+        print_registers(interpreter->cpu);
         display_show(&(interpreter->display));
     }
 }
