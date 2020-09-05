@@ -46,16 +46,24 @@ void gui_init() {
     noecho();
     curs_set(FALSE);
     start_color();
+    keypad(stdscr, TRUE);
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     refresh();
+}
+
+void gui_init_windows() {
     for (int i=0; i<GUI_WINDOWS_NUMBER; ++i) {
         _create_window(&gui_windows_global[i]);
     }
 }
 
-void gui_destroy() {
+static void _gui_destroy_windows() {
     for (int i=0; i<GUI_WINDOWS_NUMBER; ++i) {
         delwin(gui_windows_global[i].window);
     }
+}
+
+void gui_destroy() {
+    _gui_destroy_windows();
     endwin();
 }

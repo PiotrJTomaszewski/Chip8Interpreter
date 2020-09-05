@@ -32,6 +32,7 @@ void gui_window_print(gui_window_t *gui_window, int y, int x, const char *text);
 void gui_window_putchar(gui_window_t *gui_window, int y, int x, const char character, int reverse_color);
 void gui_window_refresh(gui_window_t *gui_window);
 void gui_init();
+void gui_init_windows();
 void gui_destroy();
 
 #endif //__GUI_H__

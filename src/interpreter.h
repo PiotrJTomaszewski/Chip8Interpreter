@@ -13,7 +13,7 @@ typedef struct INTERPRETER {
     display_t display;
 } interpreter_t;
 
-interpreter_t *interpreter_init();
+interpreter_t *interpreter_init(const char *rom_file_path);
 void interpreter_free(interpreter_t *interpreter);
 
 void interpreter_run(interpreter_t *interpreter);

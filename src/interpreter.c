@@ -22,16 +22,14 @@ static inline uint8_t lower_nibble(uint8_t value) { return value & 0x0F; }
 // Get 12 lower bits of the opcode
 static inline uint16_t address_from_opcode(opcode_t *opcode) { return ((opcode->msb & 0x0F) << 8) + opcode->lsb; }
 
-interpreter_t *interpreter_init() {
+interpreter_t *interpreter_init(const char *rom_file_path) {
     srand(time(0));
     interpreter_t *interpreter = malloc(sizeof(interpreter_t));
     interpreter->cpu = cpu_init();
     interpreter->memory = memory_init();
     display_init(&(interpreter->display));
     keyboard_init();
-    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8-test-rom/test_opcode.ch8");
-    // memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/WIPEOFF");
-    memory_load_rom_file(interpreter->memory, "/home/piotr/tmp/chip8_games/INVADERS");
+    memory_load_rom_file(interpreter->memory, rom_file_path);
     print_memory(interpreter->memory);
     return interpreter;
 }
