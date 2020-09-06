@@ -103,10 +103,10 @@ static inline void interpeter_exec_op0xF(interpreter_t *interpreter, opcode_t *o
         case 0x1E: // ADD I, Vx
             cpu->mem_addr_reg = add_16bit(cpu->mem_addr_reg, (uint16_t)cpu->general_reg[x_reg_id]);
             break;
-        case 0x29: // LD F, Vx
-            debug_error_printf("Operation 0x%x%x not implemented", opcode->msb, opcode->lsb);
+        case 0x29: // LD Font, Vx
+            cpu->mem_addr_reg = memory_get_font_addr(interpreter->memory, cpu->general_reg[x_reg_id]);
             break;
-        case 0x33: // LD BCD, Vx (Store BCD representation at I, I+1, I+2)
+        case 0x33: // LD BCD, Vx (Store BCD representation of Vx at I, I+1, I+2)
             {
                 uint8_t *memory = interpreter->memory->general;
                 uint8_t value_to_store = cpu->general_reg[x_reg_id];
