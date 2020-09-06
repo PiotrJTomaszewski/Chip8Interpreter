@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <menu.h>
 #include <string.h>
+#include <errno.h>
 
 #include "rom_selector.h"
 
@@ -17,14 +18,14 @@ static ITEM *_create_menu(ITEM **menu_items) {
     noecho();
 
     menu = new_menu(menu_items);
-    window = newwin(30, 80, 5, 5);
+    window = newwin(32, 80, 5, 5);
     box(window, 0, 0 );
     keypad(window, TRUE);
 
     set_menu_win(menu, window);
-    set_menu_sub( menu, derwin(window, 16, 14, 1, 1));
+    set_menu_sub(menu, derwin(window, 30, 50, 1, 1));
     set_menu_mark(menu, " ");
-    set_menu_format(menu, 15, 1);
+    set_menu_format(menu, 30, 1);
     post_menu(menu);
     wrefresh(window);
 
@@ -74,16 +75,19 @@ void rom_selector(char *path) {
                 ++number_of_files;
             }
         }
+        if (errno != 0) {
+            perror("Error while listing files");
+        }
 
         MENU *rom_selector_menu;
         ITEM *cur_item;
         ITEM **rom_items;
         char **file_names;
         WINDOW *menu_window;
-        menu_window = newwin(10, 40, 4, 4);
+        menu_window = newwin(20, 40, 4, 4);
         keypad(menu_window, TRUE);
         file_names = (char**)calloc(number_of_files, sizeof(char*));
-        rom_items = (ITEM **)calloc(number_of_files+1, sizeof(ITEM*));
+        rom_items = (ITEM **)calloc(number_of_files, sizeof(ITEM*));
         seekdir(d, begin);
         int i=0;
         while((dir = readdir(d)) != NULL) {
@@ -93,9 +97,9 @@ void rom_selector(char *path) {
                 rom_items[i] = new_item(file_names[i], "");
                 ++i;
             }
-            dir = readdir(d);
         }
         closedir(d);
+        rom_items[number_of_files] = (ITEM *)NULL;
         ITEM *selected = _create_menu(rom_items);
         strcpy(path, Location);
         strcat(path, "/");
@@ -103,6 +107,9 @@ void rom_selector(char *path) {
 
         for(i=0; i<number_of_files; ++i) {
             free_item(rom_items[i]);
+            free(file_names[i]);
         }
+        free(file_names);
+        free(rom_items);
     }
 }
