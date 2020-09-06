@@ -20,8 +20,8 @@ void display_free(display_t *display) {
 int display_draw(display_t *display, int x, int y, uint8_t byte) {
     int collision = 0;
     for (int bit_pos=8; bit_pos>=0; --bit_pos) {
-        collision |= (display->buffer[y][(x-bit_pos+8) % DISPLAY_COLS] == 1) && ((byte & (1 << bit_pos)) >> bit_pos == 0);
-        display->buffer[y][(x-bit_pos+8) % DISPLAY_COLS] ^= (byte & (1 << bit_pos)) >> bit_pos;
+        collision |= (display->buffer[y][(x-bit_pos+7) % DISPLAY_COLS] == 1) && ((byte & (1 << bit_pos)) >> bit_pos == 0);
+        display->buffer[y][(x-bit_pos+7) % DISPLAY_COLS] ^= (byte & (1 << bit_pos)) >> bit_pos;
     }
     return collision;
 }
