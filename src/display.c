@@ -48,7 +48,8 @@ void display_end(display_t *display) {
 
 bool display_draw(display_t *display, int y, int x, display_pixel_state_t pixel_state) {
     // Pixels wrap around the screen
-    x = x % DISPLAY_SCREEN_WIDTH;
+    x %= DISPLAY_SCREEN_WIDTH;
+    y %= DISPLAY_SCREEN_HEIGHT;
     bool collision = (pixel_state == PIXEL_INACTIVE) && (display->buffer[y][x] == PIXEL_ACTIVE);
     display->buffer[y][x] ^= pixel_state;
     display->dirty = true;
