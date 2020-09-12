@@ -9,7 +9,6 @@
 #include "rom_selector.h"
 
 static ITEM *_create_menu(ITEM **menu_items) {
-    int ch;
     MENU *menu;
     WINDOW *window;
 
@@ -32,8 +31,7 @@ static ITEM *_create_menu(ITEM **menu_items) {
     int menu_should_run = TRUE;
     ITEM *selected_item;
     while(menu_should_run) {
-        ch = wgetch(window);
-        switch(ch) {
+        switch(wgetch(window)) {
             case KEY_DOWN:
                 menu_driver(menu, REQ_DOWN_ITEM);
                 break;
@@ -57,18 +55,19 @@ static ITEM *_create_menu(ITEM **menu_items) {
     }
     unpost_menu(menu);
     free_menu(menu);
+    delwin(window);
+    endwin();
     return selected_item;
 }
 
-void rom_selector(char *path) {
-    const char *Location = "/home/piotr/tmp/chip8_games"; // TODO: Allow modifying this
+void rom_selector(const char *base_path, char *rom_path) {
     char *rom_options;
     DIR *d;
     struct dirent *dir;
 
-    d = opendir(Location);
+    d = opendir(base_path);
     if (d) {
-        int number_of_files = 0;
+        int number_of_files = 0; // TODO: Display how many were found
         int begin = telldir(d);
         while((dir = readdir(d)) != NULL) {
             if (dir->d_type == DT_REG) {
@@ -83,9 +82,6 @@ void rom_selector(char *path) {
         ITEM *cur_item;
         ITEM **rom_items;
         char **file_names;
-        WINDOW *menu_window;
-        menu_window = newwin(20, 40, 4, 4);
-        keypad(menu_window, TRUE);
         file_names = (char**)calloc(number_of_files, sizeof(char*));
         rom_items = (ITEM **)calloc(number_of_files, sizeof(ITEM*));
         seekdir(d, begin);
@@ -101,13 +97,13 @@ void rom_selector(char *path) {
         closedir(d);
         rom_items[number_of_files] = (ITEM *)NULL;
         ITEM *selected = _create_menu(rom_items);
-        strcpy(path, Location);
-        strcat(path, "/");
-        strcat(path, selected->name.str);
+        strcpy(rom_path, base_path);
+        strcat(rom_path, "/");
+        strcat(rom_path, selected->name.str);
 
         for(i=0; i<number_of_files; ++i) {
             free_item(rom_items[i]);
-            free(file_names[i]);
+            // free(file_names[i]); //TODO: WHY it's incorrect!
         }
         free(file_names);
         free(rom_items);

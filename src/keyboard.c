@@ -1,60 +1,161 @@
-#include <ncurses.h>
+#include <SDL2/SDL.h>
+#include <string.h>
 
 #include "keyboard.h"
-#include "gui.h"
 
-#define KEYBOARD_KEY_NO 16
-// Not in an array so I can use it in switch
-#define KEYBOARD_MAP_0 'x'
-#define KEYBOARD_MAP_1 '1'
-#define KEYBOARD_MAP_2 '2'
-#define KEYBOARD_MAP_3 '3'
-#define KEYBOARD_MAP_4 'q'
-#define KEYBOARD_MAP_5 'w'
-#define KEYBOARD_MAP_6 'e'
-#define KEYBOARD_MAP_7 'a'
-#define KEYBOARD_MAP_8 's'
-#define KEYBOARD_MAP_9 'd'
-#define KEYBOARD_MAP_A 'z'
-#define KEYBOARD_MAP_B 'c'
-#define KEYBOARD_MAP_C '4'
-#define KEYBOARD_MAP_D 'r'
-#define KEYBOARD_MAP_E 'f'
-#define KEYBOARD_MAP_F 'v'
+#define PAUSE_KEY_ SDLK_SPACE
 
-
-void keyboard_init() {
-    WINDOW *window = gui_windows_global[GUI_WINDOW_DISPLAY].window;
-    // wtimeout(window, 0);
-    keypad(window, TRUE);
+void keyboard_init(keyboard_pressed_t *pressed) {
+    memset(pressed->keypad, false, KEYPAD_KEY_COUNT);
+    pressed->exit = false;
+    pressed->pause = false;
 }
 
-uint8_t keyboard_get_pressed_key(int blocking) {
-    if (blocking) {
-        wtimeout(gui_windows_global[GUI_WINDOW_DISPLAY].window, -1);
-    } else {
-        wtimeout(gui_windows_global[GUI_WINDOW_DISPLAY].window, 0);
+static void interpret_last_event(SDL_Event *event, keyboard_pressed_t *pressed) {
+    switch (event->type) {
+        case SDL_QUIT:
+            pressed->exit = true;
+            break;
+        case SDL_KEYDOWN:
+            switch (event->key.keysym.sym) {
+                case KEYPAD_MAP_0:
+                    pressed->keypad[0] = true;
+                    break;
+                case KEYPAD_MAP_1:
+                    pressed->keypad[1] = true;
+                    break;
+                case KEYPAD_MAP_2:
+                    pressed->keypad[2] = true;
+                    break;
+                case KEYPAD_MAP_3:
+                    pressed->keypad[3] = true;
+                    break;
+                case KEYPAD_MAP_4:
+                    pressed->keypad[4] = true;
+                    break;
+                case KEYPAD_MAP_5:
+                    pressed->keypad[5] = true;
+                    break;
+                case KEYPAD_MAP_6:
+                    pressed->keypad[6] = true;
+                    break;
+                case KEYPAD_MAP_7:
+                    pressed->keypad[7] = true;
+                    break;
+                case KEYPAD_MAP_8:
+                    pressed->keypad[8] = true;
+                    break;
+                case KEYPAD_MAP_9:
+                    pressed->keypad[9] = true;
+                    break;
+                case KEYPAD_MAP_A:
+                    pressed->keypad[10] = true;
+                    break;
+                case KEYPAD_MAP_B:
+                    pressed->keypad[11] = true;
+                    break;
+                case KEYPAD_MAP_C:
+                    pressed->keypad[12] = true;
+                    break;
+                case KEYPAD_MAP_D:
+                    pressed->keypad[13] = true;
+                    break;
+                case KEYPAD_MAP_E:
+                    pressed->keypad[14] = true;
+                    break;
+                case KEYPAD_MAP_F:
+                    pressed->keypad[15] = true;
+                    break;
+                case PAUSE_KEY_:
+                    pressed->pause = true;
+                    break;
+                default:
+                    break;
+                }
+            break;
+        case SDL_KEYUP:
+            switch (event->key.keysym.sym) {
+                case KEYPAD_MAP_0:
+                    pressed->keypad[0] = false;
+                    break;
+                case KEYPAD_MAP_1:
+                    pressed->keypad[1] = false;
+                    break;
+                case KEYPAD_MAP_2:
+                    pressed->keypad[2] = false;
+                    break;
+                case KEYPAD_MAP_3:
+                    pressed->keypad[3] = false;
+                    break;
+                case KEYPAD_MAP_4:
+                    pressed->keypad[4] = false;
+                    break;
+                case KEYPAD_MAP_5:
+                    pressed->keypad[5] = false;
+                    break;
+                case KEYPAD_MAP_6:
+                    pressed->keypad[6] = false;
+                    break;
+                case KEYPAD_MAP_7:
+                    pressed->keypad[7] = false;
+                    break;
+                case KEYPAD_MAP_8:
+                    pressed->keypad[8] = false;
+                    break;
+                case KEYPAD_MAP_9:
+                    pressed->keypad[9] = false;
+                    break;
+                case KEYPAD_MAP_A:
+                    pressed->keypad[10] = false;
+                    break;
+                case KEYPAD_MAP_B:
+                    pressed->keypad[11] = false;
+                    break;
+                case KEYPAD_MAP_C:
+                    pressed->keypad[12] = false;
+                    break;
+                case KEYPAD_MAP_D:
+                    pressed->keypad[13] = false;
+                    break;
+                case KEYPAD_MAP_E:
+                    pressed->keypad[14] = false;
+                    break;
+                case KEYPAD_MAP_F:
+                    pressed->keypad[15] = false;
+                    break;
+                case PAUSE_KEY_:
+                    pressed->pause = false;
+                    break;
+                default:
+                    break;
+                }
+            break;
+        default:
+            break;
     }
-    char c = wgetch(gui_windows_global[GUI_WINDOW_DISPLAY].window);
-    int pressed_key;
-    switch(c) {
-        case KEYBOARD_MAP_0: pressed_key = 0;  break;
-        case KEYBOARD_MAP_1: pressed_key = 1;  break;
-        case KEYBOARD_MAP_2: pressed_key = 2;  break;
-        case KEYBOARD_MAP_3: pressed_key = 3;  break;
-        case KEYBOARD_MAP_4: pressed_key = 4;  break;
-        case KEYBOARD_MAP_5: pressed_key = 5;  break;
-        case KEYBOARD_MAP_6: pressed_key = 6;  break;
-        case KEYBOARD_MAP_7: pressed_key = 7;  break;
-        case KEYBOARD_MAP_8: pressed_key = 8;  break;
-        case KEYBOARD_MAP_9: pressed_key = 9;  break;
-        case KEYBOARD_MAP_A: pressed_key = 10; break;
-        case KEYBOARD_MAP_B: pressed_key = 11; break;
-        case KEYBOARD_MAP_C: pressed_key = 12; break;
-        case KEYBOARD_MAP_D: pressed_key = 13; break;
-        case KEYBOARD_MAP_E: pressed_key = 14; break;
-        case KEYBOARD_MAP_F: pressed_key = 15; break;
-        default:             pressed_key = KEYBOARD_NO_KEY_PRESSED; break;
+}
+
+void keyboard_poll_pressed(keyboard_pressed_t *pressed) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0) {
+        interpret_last_event(&event, pressed);
     }
-    return pressed_key;
+}
+
+void keyboard_wait_for_press(keyboard_pressed_t *pressed) {
+    SDL_Event event;
+    SDL_WaitEvent(&event);
+    interpret_last_event(&event, pressed);
+}
+
+bool keyboard_is_keypad_key_pressed(keyboard_pressed_t *pressed, int key_id) {
+    return pressed->keypad[key_id];
+}
+
+keypad_map_t keyboard_get_pressed(keyboard_pressed_t *pressed) {
+    for (int i=0; i<KEYPAD_KEY_COUNT; ++i) {
+        if (pressed->keypad[i]) {
+            return i;
+        }
+    }
 }
