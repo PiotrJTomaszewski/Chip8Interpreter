@@ -11,7 +11,7 @@ set(SDL2_INCLUDE_DIR /usr/include/SDL2)
 set(SDL2_LIBRARY /usr/lib64/libSDL2.so)
 include_directories(${SDL2_INCLUDE_DIR})
 
-add_executable(${PROJECT_NAME} main.c rom_selector.c display.c debug.c keyboard.c cpu.c memory.c)
+add_executable(${PROJECT_NAME} main.c rom_selector.c display.c debug.c keyboard.c cpu.c memory.c timer_reg.c)
 target_link_libraries(${PROJECT_NAME} ${CURSES_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} menu)
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})

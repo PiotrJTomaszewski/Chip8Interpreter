@@ -6,6 +6,7 @@
 #include "display.h"
 #include "memory.h"
 #include "keyboard.h"
+#include "timer_reg.h"
 
 #define CPU_FLAG_REG_ID 0x0F
 #define CPU_GENERAL_REGISTERS_COUNT 16
@@ -14,8 +15,8 @@
 typedef struct CPU {
     uint8_t general_reg[CPU_GENERAL_REGISTERS_COUNT];
     uint16_t mem_addr_reg; // Register I
-    uint8_t delay_timer_reg;
-    uint8_t sound_timer_reg;
+    timer_reg_t delay_timer;
+    timer_reg_t sound_timer;
     uint16_t pc; // Program Counter
     uint8_t sp; // Stack Pointer
     uint16_t stack[CPU_STACK_SIZE];

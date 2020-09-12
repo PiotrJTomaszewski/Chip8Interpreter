@@ -99,9 +99,9 @@ void debug_print_registers(cpu_t *cpu) {
     }
     sprintf(buffer_, "REGISTER I: 0x%04X", cpu->mem_addr_reg);
     mvwprintw(win, 1, RegistersSecondColumn, buffer_);
-    sprintf(buffer_, "DELAY TIMER: 0x%02X", cpu->delay_timer_reg);
+    sprintf(buffer_, "DELAY TIMER: 0x%02X", cpu->delay_timer.reg);
     mvwprintw(win, 2, RegistersSecondColumn, buffer_);
-    sprintf(buffer_, "SOUND TIMER: 0x%02X", cpu->sound_timer_reg);
+    sprintf(buffer_, "SOUND TIMER: 0x%02X", cpu->sound_timer.reg);
     mvwprintw(win, 3, RegistersSecondColumn, buffer_);
     sprintf(buffer_, "PC: 0x%04X", cpu->pc);
     mvwprintw(win, 4, RegistersSecondColumn, buffer_);

@@ -33,14 +33,12 @@ void interpreter_loop() {
             cpu_fetch_next_opcode(&cpu, &opcode);
             cpu_exec_opcode(&cpu, &opcode);
         }
-        if (cpu.delay_timer_reg > 0) {
-            
-        }
-
         if (display_.dirty) {
             display_show(&display_);
         }
         debug_print_all(&memory_, &cpu, &pressed_keys);
+        timer_update_time(&cpu.delay_timer, SDL_GetTicks());
+        timer_update_time(&cpu.sound_timer, SDL_GetTicks());
         stop = SDL_GetTicks();
         if (stop-start < FRAME_MILLISECONDS) {
             SDL_Delay(FRAME_MILLISECONDS - (stop - start));
