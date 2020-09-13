@@ -4,7 +4,7 @@
 static SDL_Rect tile_ = {.w=DISPLAY_TILE_SIZE, .h=DISPLAY_TILE_SIZE};
 
 int display_init(display_t *display) {
-    int result = SDL_Init(SDL_INIT_VIDEO);
+    int result = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     if (result != 0) {
         debug_logf("SDL initialization error: %s", SDL_GetError());
     }

@@ -9,6 +9,7 @@
 #include "keyboard.h"
 #include "display.h"
 #include "debug.h"
+#include "audio.h"
 
 #define TICK_MILLISECONDS 2
 #define FRAME_MILLISECONDS 17
@@ -62,7 +63,9 @@ int main(int argc, char **argv) {
     memory_load_rom_file(&memory_, rom_path);
     if (display_init(&display_) == 0) {
         debug_windows_init();
+        audio_init();
         interpreter_loop();
+        audio_destroy();
         debug_windows_end();
     } else {
         display_end(&display_);

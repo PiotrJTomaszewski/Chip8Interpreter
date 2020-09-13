@@ -6,8 +6,8 @@
 void cpu_init(cpu_t *cpu, display_t *display, memory_t *memory, keyboard_pressed_t *pressed_keys) {
     cpu->pc = 0x200;
     cpu->sp = 0;
-    cpu->delay_timer.reg = 0;
-    cpu->sound_timer.reg = 0;
+    timer_init(&cpu->delay_timer, TIMER_DELAY);
+    timer_init(&cpu->sound_timer, TIMER_AUDIO);
     cpu->display = display;
     cpu->memory = memory;
     cpu->pressed_keys = pressed_keys;
