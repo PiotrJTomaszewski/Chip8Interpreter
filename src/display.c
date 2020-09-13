@@ -46,12 +46,12 @@ void display_end(display_t *display) {
     SDL_Quit();
 }
 
-bool display_draw(display_t *display, int y, int x, display_pixel_state_t pixel_state) {
+bool display_draw(display_t *display, int y, int x) {
     // Pixels wrap around the screen
     x %= DISPLAY_SCREEN_WIDTH;
     y %= DISPLAY_SCREEN_HEIGHT;
-    bool collision = (pixel_state == PIXEL_INACTIVE) && (display->buffer[y][x] == PIXEL_ACTIVE);
-    display->buffer[y][x] ^= pixel_state;
+    bool collision = display->buffer[y][x] == PIXEL_ACTIVE;
+    display->buffer[y][x] ^= PIXEL_ACTIVE;
     display->dirty = true;
     return collision;
 }
@@ -62,6 +62,7 @@ void display_clear(display_t *display) {
             display->buffer[y][x] = PIXEL_INACTIVE;
         }
     }
+    display->dirty = true;
 }
 
 void display_show(display_t *display) {

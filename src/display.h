@@ -26,7 +26,7 @@ int display_create_window(display_t *display);
 void display_destroy_window(display_t *display);
 void display_end(display_t *display);
 // Return true if a pixel was deactivated
-bool display_draw(display_t *display, int y, int x, display_pixel_state_t pixel_state);
+bool display_draw(display_t *display, int y, int x);
 void display_clear(display_t *display);
 void display_show(display_t *display);
 

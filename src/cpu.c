@@ -23,10 +23,10 @@ static inline uint8_t lower_nibble_(uint8_t value) {return value & 0x0F;}
 // Get 12 lower bits of the opcode
 static inline uint16_t address_from_opcode_(opcode_t *opcode) {return ((opcode->msb & 0x0F) << 8) + opcode->lsb;}
 
-static inline uint8_t add_8bit_(uint8_t a, uint8_t b) {return (a + b) % 0xFF;}
-static inline uint16_t add_16bit_(uint16_t a, uint16_t b) {return (a + b) % 0xFFFF;}
+static inline uint8_t add_8bit_(uint8_t a, uint8_t b) {return (a + b) % 256;}
+static inline uint16_t add_16bit_(uint16_t a, uint16_t b) {return (a + b) % 65536;}
 
-static inline void skip_op_(cpu_t *cpu) {cpu->pc = (cpu->pc + 2) % 0xFFFF;}
+static inline void skip_op_(cpu_t *cpu) {cpu->pc = add_16bit_(cpu->pc, 2);}
 
 void cpu_fetch_next_opcode(cpu_t *cpu, opcode_t *opcode) {
     opcode->msb = memory_read_byte(cpu->memory, cpu->pc);
@@ -51,7 +51,7 @@ static inline void interpeter_exec_op0xF_(cpu_t *cpu, opcode_t *opcode) {
             break;
         case 0x18: // LD SoundTimer, Vx
             cpu->sound_timer = cpu->general_reg[x_reg_id];
-            audio_play(cpu->sound_timer/60);
+            audio_play((cpu->sound_timer/60)+1);
             break;
         case 0x1E: // ADD I, Vx
             cpu->mem_addr_reg = add_16bit_(cpu->mem_addr_reg, (uint16_t)cpu->general_reg[x_reg_id]);
@@ -191,15 +191,16 @@ void cpu_exec_opcode(cpu_t *cpu, opcode_t *opcode) {
             display_pixel_state_t pixel_state;
             uint8_t byte;
             int bytes_to_read = lower_nibble_(opcode->lsb);
-            int collision = false;
+            int collision = 0;
             for (int i=0; i<bytes_to_read; ++i) {
                 byte = memory_read_byte(cpu->memory, add_16bit_(cpu->mem_addr_reg, i));
-                for (int bit_pos=8; bit_pos>=0; --bit_pos) { // TODO: Rework this
-                    pixel_state = (byte & (1 << bit_pos)) >> bit_pos;
-                    collision |= display_draw(cpu->display, y_pos+i, x_pos-bit_pos+7, pixel_state);
+                for (int bit_pos=8; bit_pos>=0; --bit_pos) {
+                    if ((byte & (1 << bit_pos)) != PIXEL_INACTIVE) {
+                        collision |= display_draw(cpu->display, y_pos+i, x_pos-bit_pos+7);
+                    }
                 }
             }
-            cpu->general_reg[CPU_FLAG_REG_ID] = collision ? 1 : 0;
+            cpu->general_reg[CPU_FLAG_REG_ID] = collision;
         }
         break;
     case 0xE:
