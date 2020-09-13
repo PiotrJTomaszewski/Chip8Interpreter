@@ -2,12 +2,13 @@
 
 #include "cpu.h"
 #include "debug.h"
+#include "audio.h"
 
 void cpu_init(cpu_t *cpu, display_t *display, memory_t *memory, keyboard_pressed_t *pressed_keys) {
     cpu->pc = 0x200;
     cpu->sp = 0;
-    timer_init(&cpu->delay_timer, TIMER_DELAY);
-    timer_init(&cpu->sound_timer, TIMER_AUDIO);
+    cpu->delay_timer = 0;
+    cpu->sound_timer = 0;
     cpu->display = display;
     cpu->memory = memory;
     cpu->pressed_keys = pressed_keys;
@@ -39,17 +40,18 @@ static inline void interpeter_exec_op0xF_(cpu_t *cpu, opcode_t *opcode) {
     int x_reg_id = lower_nibble_(opcode->msb);
     switch(opcode->lsb) {
         case 0x07: // LD Vx, DelayTimer
-            cpu->general_reg[x_reg_id] = cpu->delay_timer.reg;
+            cpu->general_reg[x_reg_id] = cpu->delay_timer;
             break;
         case 0x0A: // LD Vx, KEY (wait for key press)
             keyboard_wait_for_press(cpu->pressed_keys);
             cpu->general_reg[x_reg_id] = keyboard_get_pressed(cpu->pressed_keys);
             break;
         case 0x15: // LD DelayTimer, Vx
-            timer_set(&cpu->delay_timer, cpu->general_reg[x_reg_id]);
+            cpu->delay_timer = cpu->general_reg[x_reg_id];
             break;
         case 0x18: // LD SoundTimer, Vx
-            timer_set(&cpu->sound_timer, cpu->general_reg[x_reg_id]);
+            cpu->sound_timer = cpu->general_reg[x_reg_id];
+            audio_play(cpu->sound_timer/60);
             break;
         case 0x1E: // ADD I, Vx
             cpu->mem_addr_reg = add_16bit_(cpu->mem_addr_reg, (uint16_t)cpu->general_reg[x_reg_id]);

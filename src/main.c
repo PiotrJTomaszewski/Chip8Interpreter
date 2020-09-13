@@ -38,8 +38,12 @@ void interpreter_loop() {
             display_show(&display_);
         }
         debug_print_all(&memory_, &cpu, &pressed_keys);
-        timer_update_time(&cpu.delay_timer, SDL_GetTicks());
-        timer_update_time(&cpu.sound_timer, SDL_GetTicks());
+        if (cpu.delay_timer > 0) {
+            --cpu.delay_timer;
+        }
+        if (cpu.sound_timer > 0) {
+            --cpu.sound_timer;
+        }
         stop = SDL_GetTicks();
         if (stop-start < FRAME_MILLISECONDS) {
             SDL_Delay(FRAME_MILLISECONDS - (stop - start));
