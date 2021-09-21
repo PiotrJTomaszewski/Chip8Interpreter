@@ -13,7 +13,6 @@ configure_file("assets/sound_effect.wav" "${CMAKE_CURRENT_BINARY_DIR}/sound_effe
 include_directories(
     inc
     interpreter/inc
-    ${SDL_MIXER_INCLUDE_DIRS}
 )
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -21,5 +20,4 @@ add_executable(Chip8 ${SOURCES})
 target_link_libraries(Chip8
     Chip8Interpreter
     ${IMGUI_LIBRARIES}
-    ${SDL_MIXER_LIBRARIES}
 )
