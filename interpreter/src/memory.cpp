@@ -38,7 +38,7 @@ void Memory::load_rom_file(std::string path) {
 
     // Skip to the program start
     rom.seekg(MEM_PROGRAM_START, std::ios::beg);
-    rom.read(reinterpret_cast<char *>(data), file_size - MEM_PROGRAM_START);
+    rom.read(reinterpret_cast<char *>(data) + MEM_PROGRAM_START, file_size - MEM_PROGRAM_START);
     rom.close();
 }
 
