@@ -15,6 +15,7 @@ CPU::~CPU() {
 void CPU::restart() {
     pc = 0x200;
     sp = 0;
+    waiting_for_key_press = false;
 }
 
 inline void CPU::stack_push(uint16_t value) {stack[++sp] = value;}
@@ -172,10 +173,22 @@ void CPU::execute_instr(opcode_t opcode) {
             switch(opcode.lsb) {
                 case 0x07: // LD Vx, DelayTimer
                     general_reg[x_reg_id] = io.timers.get_delay_timer();
-                    break;
+                    break; 
                 case 0x0A: // LD Vx, KEY (wait for key press)
-                    io.keypad.wait_for_press();
-                    general_reg[x_reg_id] = io.keypad.get_pressed_id();
+                    // In my implementation this instruction is being called in a loop until a key is pressed
+                    if (waiting_for_key_press) { // Already waiting, check if key is pressed
+                        int pressed = io.keypad.get_pressed_id();
+                        if (pressed != -1) { // -1 means no key is pressed
+                            general_reg[x_reg_id] = pressed;
+                            waiting_for_key_press = false; // Key was pressed, we can execute next instruction
+                        }
+                    } else { // First call, start waiting
+                        waiting_for_key_press = true;
+                    }
+                    if (waiting_for_key_press) {
+                        // Decrement PC to execute this instruction again
+                        pc -= 2;
+                    }
                     break;
                 case 0x15: // LD DelayTimer, Vx
                     io.timers.set_delay_timer(general_reg[x_reg_id]);
@@ -194,7 +207,7 @@ void CPU::execute_instr(opcode_t opcode) {
                         uint8_t value_to_store = general_reg[x_reg_id];
                         memory.write(mem_addr_reg, value_to_store / 100);
                         memory.write(add_16bit(mem_addr_reg, 1), (value_to_store % 100) / 10);
-                        memory.write( add_16bit(mem_addr_reg, 2), value_to_store % 10);
+                        memory.write(add_16bit(mem_addr_reg, 2), value_to_store % 10);
                     }
                     break;
                 case 0x55: // LD [I], Vx (Store V0 to Vx in memory)

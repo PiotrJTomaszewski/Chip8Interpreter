@@ -5,9 +5,10 @@ public:
     Keypad();
     ~Keypad();
     void set_pressed(int key_id);
+    void set_released(int key_id);
     bool get_is_pressed(int key_id);
     int get_pressed_id();
-    void wait_for_press();
+    int get_key_count();
 
 private:
     static const int KEY_COUNT = 16;

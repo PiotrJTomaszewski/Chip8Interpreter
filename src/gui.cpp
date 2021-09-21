@@ -62,9 +62,10 @@ void GUI::display() {
 
     display_main_menu();
     display_cpu();
-    mem_edit.DrawWindow("CPU Stack", system.get_cpu().get_stack(), system.get_cpu().get_stack_size());
+    mem_edit.DrawWindow("Stack", system.get_cpu().get_stack(), system.get_cpu().get_stack_size());
     mem_edit.DrawWindow("Memory", system.get_memory().get_memory_raw(), system.get_memory().get_memory_size());
     display_screen();
+    display_io();
 
     if (ImGuiFileDialog::Instance()->Display("ROMKey")) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
@@ -95,9 +96,116 @@ void GUI::handle_events() {
         ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT) {
             should_close = true;
-        }
-        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)) {
+        } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)) {
             should_close = true;
+        } else if (event.type == SDL_KEYDOWN) {
+            auto &keypad = system.get_io().keypad;
+            switch (event.key.keysym.sym) {
+                case SDLK_1:
+                    keypad.set_pressed(0x1);
+                    break;
+                case SDLK_2:
+                    keypad.set_pressed(0x2);
+                    break;
+                case SDLK_3:
+                    keypad.set_pressed(0x3);
+                    break;
+                case SDLK_4:
+                    keypad.set_pressed(0xC);
+                    break;
+                case SDLK_q:
+                    keypad.set_pressed(0x4);
+                    break;
+                case SDLK_w:
+                    keypad.set_pressed(0x5);
+                    break;
+                case SDLK_e:
+                    keypad.set_pressed(0x6);
+                    break;
+                case SDLK_r:
+                    keypad.set_pressed(0xD);
+                    break;
+                case SDLK_a:
+                    keypad.set_pressed(0x7);
+                    break;
+                case SDLK_s:
+                    keypad.set_pressed(0x8);
+                    break;
+                case SDLK_d:
+                    keypad.set_pressed(0x9);
+                    break;
+                case SDLK_f:
+                    keypad.set_pressed(0xE);
+                    break;
+                case SDLK_z:
+                    keypad.set_pressed(0xA);
+                    break;
+                case SDLK_x:
+                    keypad.set_pressed(0x0);
+                    break;
+                case SDLK_c:
+                    keypad.set_pressed(0xB);
+                    break;
+                case SDLK_v:
+                    keypad.set_pressed(0xF);
+                    break;
+                default:
+                    break;
+            }
+        } else if (event.type == SDL_KEYUP) {
+            auto &keypad = system.get_io().keypad;
+            switch (event.key.keysym.sym) {
+                case SDLK_1:
+                    keypad.set_released(0x1);
+                    break;
+                case SDLK_2:
+                    keypad.set_released(0x2);
+                    break;
+                case SDLK_3:
+                    keypad.set_released(0x3);
+                    break;
+                case SDLK_4:
+                    keypad.set_released(0xC);
+                    break;
+                case SDLK_q:
+                    keypad.set_released(0x4);
+                    break;
+                case SDLK_w:
+                    keypad.set_released(0x5);
+                    break;
+                case SDLK_e:
+                    keypad.set_released(0x6);
+                    break;
+                case SDLK_r:
+                    keypad.set_released(0xD);
+                    break;
+                case SDLK_a:
+                    keypad.set_released(0x7);
+                    break;
+                case SDLK_s:
+                    keypad.set_released(0x8);
+                    break;
+                case SDLK_d:
+                    keypad.set_released(0x9);
+                    break;
+                case SDLK_f:
+                    keypad.set_released(0xE);
+                    break;
+                case SDLK_z:
+                    keypad.set_released(0xA);
+                    break;
+                case SDLK_x:
+                    keypad.set_released(0x0);
+                    break;
+                case SDLK_c:
+                    keypad.set_released(0xB);
+                    break;
+                case SDLK_v:
+                    keypad.set_released(0xF);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
@@ -117,17 +225,14 @@ void GUI::display_main_menu() {
 void GUI::display_cpu() {
     ImGui::Begin("CPU");
     auto &cpu = system.get_cpu();
-    ImGui::TextColored(ImVec4(1,1,0,1), "General Registers");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "General Registers");
     ImGui::BeginTable("#gen_reg_table", 2);
-    for (int id = 0; id < cpu.get_general_reg_count(); id += 2) {
-        ImGui::TableNextRow();
+    for (int id = 0; id < cpu.get_general_reg_count(); ++id) {
         ImGui::TableNextColumn();
         ImGui::Text("%1X: 0x%02X", id, cpu.get_general_reg(id));
-        ImGui::TableNextColumn();
-        ImGui::Text("%1X: 0x%02X", id+1, cpu.get_general_reg(id+1));
     }
     ImGui::EndTable();
-    ImGui::TextColored(ImVec4(1,1,0,1), "Other Registers");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Other Registers");
     ImGui::Text("PC: 0x%04X", cpu.get_pc());
     ImGui::Text("SP: 0x%02X", cpu.get_sp());
     ImGui::Text("Memory addr: 0x%04X", cpu.get_mem_addr_reg());
@@ -141,5 +246,35 @@ void GUI::display_screen() {
     int width = display_renderer.get_width() * SCREEN_SCALE;
     int height = display_renderer.get_height() * SCREEN_SCALE;
     ImGui::Image(reinterpret_cast<ImTextureID>(display_renderer.get_texture()), ImVec2(width, height));
+    ImGui::End();
+}
+
+void GUI::display_io() {
+    auto &timers = system.get_io().timers;
+    auto &keypad = system.get_io().keypad;
+    int key_id;
+
+    ImGui::Begin("IO");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Timers");
+    ImGui::Text("Delay: 0x%02X", timers.get_delay_timer());
+    ImGui::Text("Sound: 0x%02X", timers.get_sound_timer());
+
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Keypad");
+    ImGui::BeginTable("#keypad_table", 4);
+    for (int i = 0; i < 4; ++i) {
+        ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 10.f);
+    }
+
+    for (int i = 0; i < keypad.get_key_count(); ++i) {
+        key_id = keypad_display_order[i];
+        ImGui::TableNextColumn();
+        if (keypad.get_is_pressed(key_id)) {
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, active_key_bg_color);
+            ImGui::TextColored(active_key_fg_color, "%01X", key_id);
+        } else {
+            ImGui::Text("%01X", key_id);
+        }
+    }
+    ImGui::EndTable();
     ImGui::End();
 }

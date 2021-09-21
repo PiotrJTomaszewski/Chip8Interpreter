@@ -33,6 +33,7 @@ private:
     uint16_t pc; // Program Counter
     uint8_t sp; // Stack Pointer
     uint16_t stack[CPU_STACK_SIZE];
+    bool waiting_for_key_press;
 
     Memory &memory;
     IO &io;
