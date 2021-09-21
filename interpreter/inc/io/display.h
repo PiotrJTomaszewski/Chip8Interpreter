@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 class Display {
 public:
@@ -16,6 +17,7 @@ public:
 private:
     static const int DISPLAY_SCREEN_WIDTH = 64;
     static const int DISPLAY_SCREEN_HEIGHT = 32;
-    bool buffer[DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH]; // TODO: Use a smaller buffer
+    // Every 32bit int stores screen state for a single column
+    uint32_t buffer[DISPLAY_SCREEN_WIDTH];
     bool is_dirty;
 };

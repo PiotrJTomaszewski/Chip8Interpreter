@@ -14,14 +14,14 @@ bool Display::xor_pixel(int y, int x) {
     // Pixels wrap around the screen
     x %= DISPLAY_SCREEN_WIDTH;
     y %= DISPLAY_SCREEN_HEIGHT;
-    bool collision = buffer[y][x];
-    buffer[y][x] ^= 1;
+    bool collision = ((buffer[x] & (1 << y)) != 0);
+    buffer[x] ^= (1 << y);
     is_dirty = true;
     return collision;
 }
 
 bool Display::get_pixel(int y, int x) {
-    return buffer[y][x];
+    return (buffer[x] >> y) & 1;
 }
 
 void Display::clear() {
