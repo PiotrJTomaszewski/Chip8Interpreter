@@ -3,6 +3,7 @@
 #include "system.h"
 #include "interpreter_exception.h"
 #include "gui.h"
+#include "sound.h"
 
 #define __UNUSED(var) ((void)(var))
 
@@ -12,13 +13,13 @@ int main(int argc, char *argv[]) {
 
     System system;
     GUI gui(system);
-    // system.load_rom_file("~/Documents/Chip8InterpreterLinux/roms/IBM Logo.ch8");
+
     while (!gui.get_should_close()) {
         auto start = std::chrono::high_resolution_clock::now();
         try {
             system.run_one_frame();
         } catch (const InterpreterException &e) {
-
+            // TODO: Log
         }
         gui.display();
         auto stop = std::chrono::high_resolution_clock::now();

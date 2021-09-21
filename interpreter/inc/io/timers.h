@@ -5,7 +5,6 @@ class Timers {
 public:
     Timers();
     ~Timers();
-    void attach_sound_callbacks(void (*play_sound)(void), void (*stop_sound)(void));
     void tick();
     void restart();
     void set_delay_timer(uint8_t value);
@@ -16,6 +15,4 @@ public:
 private:
     uint8_t delay_timer;
     uint8_t sound_timer;
-    void (*play_sound_callback)(void);
-    void (*stop_sound_callback)(void);
 };
