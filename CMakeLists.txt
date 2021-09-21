@@ -8,22 +8,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 include(cmake/imgui.cmake)
 add_subdirectory(interpreter)
 
+configure_file("assets/sound_effect.wav" "${CMAKE_CURRENT_BINARY_DIR}/sound_effect.wav" COPYONLY)
+
 include_directories(
     inc
     interpreter/inc
-    lib/imgui_club/imgui_memory_editor
-    lib/ImGuiFileDialog
-    ${OPENGL_INCLUDE_DIR}
-    ${SDL2_INCLUDE_DIR}
-    ${IMGUI_INCLUDE_DIR}
-    )
+    ${SDL_MIXER_INCLUDE_DIRS}
+)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-add_executable(Chip8 ${SOURCES} lib/ImGuiFileDialog/ImGuiFileDialog.cpp)
+add_executable(Chip8 ${SOURCES})
 target_link_libraries(Chip8
     Chip8Interpreter
-    ${OPENGL_LIBRARIES}
-    ${SDL2_LIBRARIES}
     ${IMGUI_LIBRARIES}
-    dl
-    )
+    ${SDL_MIXER_LIBRARIES}
+)
