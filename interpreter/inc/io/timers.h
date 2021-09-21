@@ -7,6 +7,7 @@ public:
     ~Timers();
     void attach_sound_callbacks(void (*play_sound)(void), void (*stop_sound)(void));
     void tick();
+    void restart();
     void set_delay_timer(uint8_t value);
     uint8_t get_delay_timer();
     void set_sound_timer(uint8_t value);

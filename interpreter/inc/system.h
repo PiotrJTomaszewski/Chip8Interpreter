@@ -10,6 +10,7 @@ public:
     ~System();
     void load_rom_file(std::string path);
     void run_one_frame();
+    void restart();
     CPU &get_cpu();
     Memory &get_memory();
     IO &get_io();

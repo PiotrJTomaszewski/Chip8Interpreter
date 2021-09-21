@@ -31,6 +31,11 @@ void Timers::tick() {
     }
 }
 
+void Timers::restart() {
+    delay_timer = 0;
+    sound_timer = 0;
+}
+
 void Timers::set_delay_timer(uint8_t value) {
     delay_timer = value;
 }

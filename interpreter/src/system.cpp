@@ -27,6 +27,12 @@ void System::run_one_frame() {
     }
 }
 
+void System::restart() {
+    cpu->restart();
+    io->timers.restart();
+    io->display.clear();
+}
+
 CPU &System::get_cpu() {
     return *cpu;
 }
