@@ -16,6 +16,13 @@ public:
     void restart();
     opcode_t fetch_next_instr();
     void execute_instr(opcode_t opcode);
+    int get_general_reg_count();
+    uint8_t get_general_reg(int id);
+    uint16_t get_mem_addr_reg();
+    uint16_t get_pc();
+    uint8_t get_sp();
+    uint16_t *get_stack();
+    int get_stack_size();
 
 private:
     static const int CPU_FLAG_REG_ID = 0x0F;

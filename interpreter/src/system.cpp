@@ -17,10 +17,24 @@ void System::load_rom_file(std::string path) {
 }
 
 void System::run_one_frame() {
-    CPU::opcode_t opcode;
-    for (int i=0; i<OPERATIONS_PER_FRAME; ++i) {
-        opcode = cpu->fetch_next_instr();
-        cpu->execute_instr(opcode);
+    if (memory->get_is_rom_loaded()) {
+        CPU::opcode_t opcode;
+        for (int i=0; i<OPERATIONS_PER_FRAME; ++i) {
+            opcode = cpu->fetch_next_instr();
+            cpu->execute_instr(opcode);
+        }
+        io->timers.tick();
     }
-    io->timers.tick();
+}
+
+CPU &System::get_cpu() {
+    return *cpu;
+}
+
+Memory &System::get_memory() {
+    return *memory;
+}
+
+IO &System::get_io() {
+    return *io;
 }

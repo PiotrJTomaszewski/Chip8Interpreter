@@ -3,7 +3,7 @@
 #include "memory.h"
 
 Memory::Memory() {
-
+    is_rom_loaded = false;
 }
 
 Memory::~Memory() {
@@ -37,11 +37,24 @@ void Memory::load_rom_file(std::string path) {
     file_size = static_cast<int>(rom.tellg()) - file_size;
 
     // Skip to the program start
-    rom.seekg(MEM_PROGRAM_START, std::ios::beg);
-    rom.read(reinterpret_cast<char *>(data) + MEM_PROGRAM_START, file_size - MEM_PROGRAM_START);
+    rom.seekg(0, std::ios::beg);
+    rom.read(reinterpret_cast<char *>(data) + MEM_PROGRAM_START, file_size);
     rom.close();
+    is_rom_loaded = true;
 }
 
 uint16_t Memory::get_font_char_address(uint8_t character) {
     return character * FONT_HEIGHT;
+}
+
+bool Memory::get_is_rom_loaded() {
+    return is_rom_loaded;
+}
+
+uint8_t *Memory::get_memory_raw() {
+    return data;
+}
+
+int Memory::get_memory_size() {
+    return MEM_SIZE;
 }

@@ -11,6 +11,9 @@ public:
     void clear(bool clear_font_data);
     void load_rom_file(std::string path);
     uint16_t get_font_char_address(uint8_t character);
+    bool get_is_rom_loaded();
+    uint8_t *get_memory_raw();
+    int get_memory_size();
 
 private:
     static const int MEM_SIZE = 0x1000;
@@ -38,4 +41,6 @@ private:
         0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
+
+    bool is_rom_loaded;
 };

@@ -218,3 +218,31 @@ void CPU::execute_instr(opcode_t opcode) {
             throw InterpreterException("Invalid operation 0x%x%x", opcode.msb, opcode.lsb);
     }
 }
+
+int CPU::get_general_reg_count() {
+    return CPU_GENERAL_REGISTERS_COUNT;
+}
+
+uint8_t CPU::get_general_reg(int id) {
+    return general_reg[id];
+}
+
+uint16_t CPU::get_mem_addr_reg() {
+    return mem_addr_reg;
+}
+
+uint16_t CPU::get_pc() {
+    return pc;
+}
+
+uint8_t CPU::get_sp() {
+    return sp;
+}
+
+uint16_t *CPU::get_stack() {
+    return stack;
+}
+
+int CPU::get_stack_size() {
+    return CPU_STACK_SIZE;
+}

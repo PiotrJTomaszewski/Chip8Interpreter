@@ -9,6 +9,7 @@ include(cmake/imgui.cmake)
 add_subdirectory(interpreter)
 
 include_directories(
+    inc
     interpreter/inc
     lib/imgui_club/imgui_memory_editor
     lib/ImGuiFileDialog

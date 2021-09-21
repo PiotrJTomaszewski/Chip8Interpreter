@@ -10,6 +10,9 @@ public:
     ~System();
     void load_rom_file(std::string path);
     void run_one_frame();
+    CPU &get_cpu();
+    Memory &get_memory();
+    IO &get_io();
 private:
     static const int OPERATIONS_PER_FRAME = 8;
     CPU *cpu;
