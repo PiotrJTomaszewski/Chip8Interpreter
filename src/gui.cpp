@@ -1,7 +1,7 @@
 #include "ImGuiFileDialog.h"
 #include "gui.h"
 
-GUI::GUI(System &system): system(system) {
+GUI::GUI(System &system): system(system), display_renderer(system.get_io().display) {
     // From https://github.com/ocornut/imgui/blob/master/examples/example_sdl_opengl3/main.cpp
     // Setup SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
@@ -64,11 +64,13 @@ void GUI::display() {
     display_cpu();
     mem_edit.DrawWindow("CPU Stack", system.get_cpu().get_stack(), system.get_cpu().get_stack_size());
     mem_edit.DrawWindow("Memory", system.get_memory().get_memory_raw(), system.get_memory().get_memory_size());
+    display_screen();
 
     if (ImGuiFileDialog::Instance()->Display("ROMKey")) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
             file_path = ImGuiFileDialog::Instance()->GetFilePathName();
             system.load_rom_file(file_path);
+            system.restart();
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -129,5 +131,15 @@ void GUI::display_cpu() {
     ImGui::Text("PC: 0x%04X", cpu.get_pc());
     ImGui::Text("SP: 0x%02X", cpu.get_sp());
     ImGui::Text("Memory addr: 0x%04X", cpu.get_mem_addr_reg());
+    ImGui::End();
+}
+
+void GUI::display_screen() {
+    const int SCREEN_SCALE = 10;
+    ImGui::Begin("Screen");
+    display_renderer.render_if_dirty();
+    int width = display_renderer.get_width() * SCREEN_SCALE;
+    int height = display_renderer.get_height() * SCREEN_SCALE;
+    ImGui::Image(reinterpret_cast<ImTextureID>(display_renderer.get_texture()), ImVec2(width, height));
     ImGui::End();
 }

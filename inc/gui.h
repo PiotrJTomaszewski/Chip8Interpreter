@@ -7,6 +7,7 @@
 #include "imgui_memory_editor.h"
 
 #include "system.h"
+#include "display_renderer.h"
 
 class GUI {
 public:
@@ -26,4 +27,6 @@ private:
     void handle_events();
     void display_main_menu();
     void display_cpu();
+    void display_screen();
+    DisplayRenderer display_renderer;
 };

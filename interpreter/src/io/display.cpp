@@ -2,7 +2,7 @@
 #include "io/display.h"
 
 Display::Display() {
-    dirty = false;
+    is_dirty = false;
 }
 
 Display::~Display() {
@@ -16,10 +16,30 @@ bool Display::xor_pixel(int y, int x) {
     y %= DISPLAY_SCREEN_HEIGHT;
     bool collision = buffer[y][x];
     buffer[y][x] ^= 1;
-    dirty = true;
+    is_dirty = true;
     return collision;
+}
+
+bool Display::get_pixel(int y, int x) {
+    return buffer[y][x];
 }
 
 void Display::clear() {
     memset(buffer, 0, sizeof(buffer));
+}
+
+int Display::get_width() {
+    return DISPLAY_SCREEN_WIDTH;
+}
+
+int Display::get_height() {
+    return DISPLAY_SCREEN_HEIGHT;
+}
+
+bool Display::get_is_dirty() {
+    return is_dirty;
+}
+
+void Display::mark_clean() {
+    is_dirty = false;
 }
