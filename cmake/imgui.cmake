@@ -1,3 +1,4 @@
+cmake_policy(SET CMP0072 NEW)
 find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 
