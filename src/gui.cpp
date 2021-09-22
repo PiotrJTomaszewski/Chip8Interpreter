@@ -226,12 +226,13 @@ void GUI::display_cpu() {
     ImGui::Begin("CPU");
     auto &cpu = system.get_cpu();
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "General Registers");
-    ImGui::BeginTable("#gen_reg_table", 2);
-    for (int id = 0; id < cpu.get_general_reg_count(); ++id) {
-        ImGui::TableNextColumn();
-        ImGui::Text("%1X: 0x%02X", id, cpu.get_general_reg(id));
+    if (ImGui::BeginTable("#gen_reg_table", 2)) {
+        for (int id = 0; id < cpu.get_general_reg_count(); ++id) {
+            ImGui::TableNextColumn();
+            ImGui::Text("%1X: 0x%02X", id, cpu.get_general_reg(id));
+        }
+        ImGui::EndTable();
     }
-    ImGui::EndTable();
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Other Registers");
     ImGui::Text("PC: 0x%04X", cpu.get_pc());
     ImGui::Text("SP: 0x%02X", cpu.get_sp());
@@ -260,21 +261,22 @@ void GUI::display_io() {
     ImGui::Text("Sound: 0x%02X", timers.get_sound_timer());
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Keypad");
-    ImGui::BeginTable("#keypad_table", 4);
-    for (int i = 0; i < 4; ++i) {
-        ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 10.f);
-    }
-
-    for (int i = 0; i < keypad.get_key_count(); ++i) {
-        key_id = keypad_display_order[i];
-        ImGui::TableNextColumn();
-        if (keypad.get_is_pressed(key_id)) {
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, active_key_bg_color);
-            ImGui::TextColored(active_key_fg_color, "%01X", key_id);
-        } else {
-            ImGui::Text("%01X", key_id);
+    if (ImGui::BeginTable("#keypad_table", 4)) {
+        for (int i = 0; i < 4; ++i) {
+            ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 10.f);
         }
+
+        for (int i = 0; i < keypad.get_key_count(); ++i) {
+            key_id = keypad_display_order[i];
+            ImGui::TableNextColumn();
+            if (keypad.get_is_pressed(key_id)) {
+                ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, active_key_bg_color);
+                ImGui::TextColored(active_key_fg_color, "%01X", key_id);
+            } else {
+                ImGui::Text("%01X", key_id);
+            }
+        }
+        ImGui::EndTable();
     }
-    ImGui::EndTable();
     ImGui::End();
 }
