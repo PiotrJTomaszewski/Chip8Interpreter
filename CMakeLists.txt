@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 
 include(cmake/imgui.cmake)
 add_subdirectory(interpreter)
+add_subdirectory(test)
 
 configure_file("assets/sound_effect.wav" "${CMAKE_CURRENT_BINARY_DIR}/sound_effect.wav" COPYONLY)
 
