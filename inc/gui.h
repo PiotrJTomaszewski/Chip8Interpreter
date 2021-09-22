@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include "imgui.h"
@@ -15,6 +16,7 @@ public:
     ~GUI();
     void display();
     bool get_should_close();
+    void log_msg(const char msg[]);
 private:
     const ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     const int keypad_display_order[16] = {
@@ -32,10 +34,12 @@ private:
     SDL_GLContext gl_context;
     ImGuiIO io;
     DisplayRenderer display_renderer;
+    std::vector<std::string> log;
 private:
     void handle_events();
     void display_main_menu();
     void display_cpu();
     void display_screen();
     void display_io();
+    void display_log();
 };

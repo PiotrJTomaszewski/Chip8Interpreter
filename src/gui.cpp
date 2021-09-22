@@ -73,6 +73,7 @@ void GUI::display() {
     mem_edit.DrawWindow("Memory", system.get_memory().get_memory_raw(), system.get_memory().get_memory_size());
     display_screen();
     display_io();
+    display_log();
 
     if (ImGuiFileDialog::Instance()->Display("ROMKey")) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
@@ -286,4 +287,16 @@ void GUI::display_io() {
         ImGui::EndTable();
     }
     ImGui::End();
+}
+
+void GUI::display_log() {
+    ImGui::Begin("Log");
+    for (auto msg: log) {
+        ImGui::Text(msg.c_str());
+    }
+    ImGui::End();
+}
+
+void GUI::log_msg(const char *msg) {
+    log.push_back(msg);
 }

@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
         try {
             system.run_one_frame();
         } catch (const InterpreterException &e) {
-            // TODO: Log
+            gui.log_msg(e.what());
         }
         gui.display();
         auto stop = std::chrono::high_resolution_clock::now();
