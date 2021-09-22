@@ -8,6 +8,7 @@ public:
     // Returns true if a pixel was deactivated
     bool xor_pixel(int y, int x);
     bool get_pixel(int y, int x);
+    uint32_t get_col(int x);
     void clear();
     int get_width();
     int get_height();

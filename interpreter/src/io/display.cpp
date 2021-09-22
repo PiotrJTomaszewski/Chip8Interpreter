@@ -24,6 +24,10 @@ bool Display::get_pixel(int y, int x) {
     return (buffer[x] >> y) & 1;
 }
 
+uint32_t Display::get_col(int x) {
+    return buffer[x];
+}
+
 void Display::clear() {
     memset(buffer, 0, sizeof(buffer));
 }

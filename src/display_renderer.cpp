@@ -23,9 +23,11 @@ void DisplayRenderer::render_if_dirty() {
 
 void DisplayRenderer::render() {
     uint32_t *pixel_data = reinterpret_cast<uint32_t *>(surface->pixels);
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            pixel_data[y*width + x] = COLOR_PALETTE[display.get_pixel(y, x)];
+    int col;
+    for (int x = 0; x < width; ++x) {
+        col = display.get_col(x);
+        for (int y = 0; y < height; ++y) {
+            pixel_data[y*width + x] = COLOR_PALETTE[(col & (1 << y)) != 0];
         }
     }
     glEnable(GL_TEXTURE_2D);
